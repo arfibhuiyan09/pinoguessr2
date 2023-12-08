@@ -64,31 +64,29 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        #note-input {
+        #input-box {
             margin-top: 20px;
-            padding: 10px;
             font-size: 16px;
-            width: 200px;
+            padding: 10px;
+            border: 2px solid #61dafb; /* Border color - React Blue */
+            border-radius: 5px;
+            width: 80%;
         }
     </style>
-    <title>Piano Memory Game</title>
+    <title>Piano Memory Guessing Game</title>
 </head>
 <body>
     <div id="game-container">
-        <h1>Piano Memory Game</h1>
+        <h1>Piano Memory Guessing Game</h1>
         <p id="message">Try to remember the sequence!</p>
         <div id="sequence-container"></div>
-        <input type="text" id="note-input" placeholder="Enter your guesses">
+        <input type="text" id="input-box" placeholder="Enter the sequence">
         <button onclick="startGame()">Start Game</button>
         <button onclick="checkSequence()">Check My Guess</button>
+        <button onclick="showHint()">Hint</button>
     </div>
 
     <script>
-
-        
-        let sequence = [];
-        let userSequence = [];
-        let level = 1;
         const pianoNotes = {
             'A': 'sounds/a.wav',
             'B': 'sounds/b.wav',
@@ -98,6 +96,10 @@
             'F': 'sounds/f.wav'
         };
 
+        let sequence = [];
+        let userSequence = [];
+        let level = 1;
+
         function startGame() {
             sequence = generateSequence(level);
             showSequence();
@@ -106,34 +108,34 @@
         function generateSequence(length) {
             const sequence = [];
             for (let i = 0; i < length; i++) {
-                const notes = Object.keys(pianoNotes);
-                sequence.push(notes[Math.floor(Math.random() * notes.length)]);
+                const randomNote = getRandomNote();
+                sequence.push(randomNote);
             }
             return sequence;
+        }
+
+        function getRandomNote() {
+            const notes = Object.keys(pianoNotes);
+            const randomIndex = Math.floor(Math.random() * notes.length);
+            return notes[randomIndex];
         }
 
         function showSequence() {
             let i = 0;
             const interval = setInterval(() => {
-                playSound(sequence[i]);
                 highlight(sequence[i]);
                 i++;
                 if (i >= sequence.length) {
                     clearInterval(interval);
                 }
-            }, 1000 * 1.5);
-        }
-
-        function playSound(note) {
-            const audio = new Audio(pianoNotes[note]);
-            audio.play();
+            }, 1000);
         }
 
         function highlight(note) {
             const sequenceContainer = document.getElementById('sequence-container');
             const noteElement = document.createElement('div');
-            noteElement.innerHTML = note;
-            noteElement.className = `highlight`;
+            noteElement.innerHTML = '?';
+            noteElement.className = 'highlight';
 
             sequenceContainer.appendChild(noteElement);
 
@@ -143,8 +145,8 @@
         }
 
         function checkSequence() {
-            const userInput = document.getElementById('note-input').value.toUpperCase().split(' ');
-            userSequence = userInput;
+            const userInput = document.getElementById('input-box').value.toUpperCase();
+            userSequence = userInput.split(' ');
 
             if (arraysEqual(sequence, userSequence)) {
                 alert("Congratulations! You got it right!");
@@ -155,6 +157,11 @@
                 level = 1;
                 startGame();
             }
+        }
+
+        function showHint() {
+            const hintIndex = Math.floor(Math.random() * sequence.length);
+            alert(`Hint: ${sequence[hintIndex]}`);
         }
 
         function arraysEqual(arr1, arr2) {
