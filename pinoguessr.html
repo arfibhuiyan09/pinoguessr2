@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #282c34; /* Dark background color */
+            color: white;
+        }
+
+        #game-container {
+            text-align: center;
+            background-color: #2a2e39; /* Darker background color */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #sequence-container {
+            margin: 20px 0;
+            font-size: 24px;
+            padding: 10px;
+            border: 2px solid #61dafb; /* Border color - React Blue */
+            border-radius: 5px;
+            background-color: #2a2e39; /* Darker background color */
+            text-align: center; /* Center text horizontally */
+            line-height: 40px; /* Adjust line-height for vertical centering */
+        }
+
+        h1 {
+            color: #61dafb; /* React Blue */
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+            background-color: #61dafb; /* React Blue */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218cff; /* Slightly darker shade on hover */
+        }
+
+        .highlight {
+            display: inline-block;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            background-color: #61dafb; /* React Blue */
+            color: #282c34; /* Dark background color */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        #note-input {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+            width: 200px;
+        }
+    </style>
+    <title>Piano Memory Game</title>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Piano Memory Game</h1>
+        <p id="message">Try to remember the sequence!</p>
+        <div id="sequence-container"></div>
+        <input type="text" id="note-input" placeholder="Enter your guesses">
+        <button onclick="startGame()">Start Game</button>
+        <button onclick="checkSequence()">Check My Guess</button>
+    </div>
+
+    <script>
+
+        
+        let sequence = [];
+        let userSequence = [];
+        let level = 1;
+        const pianoNotes = {
+            'A': 'sounds/a.wav',
+            'B': 'sounds/b.wav',
+            'C': 'sounds/c.wav',
+            'D': 'sounds/d.wav',
+            'E': 'sounds/e.wav',
+            'F': 'sounds/f.wav'
+        };
+
+        function startGame() {
+            sequence = generateSequence(level);
+            showSequence();
+        }
+
+        function generateSequence(length) {
+            const sequence = [];
+            for (let i = 0; i < length; i++) {
+                const notes = Object.keys(pianoNotes);
+                sequence.push(notes[Math.floor(Math.random() * notes.length)]);
+            }
+            return sequence;
+        }
+
+        function showSequence() {
+            let i = 0;
+            const interval = setInterval(() => {
+                playSound(sequence[i]);
+                highlight(sequence[i]);
+                i++;
+                if (i >= sequence.length) {
+                    clearInterval(interval);
+                }
+            }, 1000 * 1.5);
+        }
+
+        function playSound(note) {
+            const audio = new Audio(pianoNotes[note]);
+            audio.play();
+        }
+
+        function highlight(note) {
+            const sequenceContainer = document.getElementById('sequence-container');
+            const noteElement = document.createElement('div');
+            noteElement.innerHTML = note;
+            noteElement.className = `highlight`;
+
+            sequenceContainer.appendChild(noteElement);
+
+            setTimeout(() => {
+                sequenceContainer.removeChild(noteElement);
+            }, 500);
+        }
+
+        function checkSequence() {
+            const userInput = document.getElementById('note-input').value.toUpperCase().split(' ');
+            userSequence = userInput;
+
+            if (arraysEqual(sequence, userSequence)) {
+                alert("Congratulations! You got it right!");
+                level++;
+                startGame();
+            } else {
+                alert("Oops! Wrong sequence. Game over!");
+                level = 1;
+                startGame();
+            }
+        }
+
+        function arraysEqual(arr1, arr2) {
+            return JSON.stringify(arr1) === JSON.stringify(arr2);
+        }
+    </script>
+</body>
+</html>
