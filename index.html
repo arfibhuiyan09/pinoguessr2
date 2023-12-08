@@ -102,7 +102,7 @@
 
         function startGame() {
             sequence = generateSequence(level);
-            showSequence();
+            playSequence(sequence);
         }
 
         function generateSequence(length) {
@@ -120,15 +120,19 @@
             return notes[randomIndex];
         }
 
-        function showSequence() {
+        function playSequence(seq) {
             let i = 0;
             const interval = setInterval(() => {
-                highlight(sequence[i]);
+                highlight(seq[i]);
+                playSound(seq[i]);
                 i++;
-                if (i >= sequence.length) {
+                if (i >= seq.length) {
                     clearInterval(interval);
                 }
             }, 1000);
+            setTimeout(() => {
+                document.getElementById('message').innerText = 'Now, guess the sequence!';
+            }, seq.length * 1000);
         }
 
         function highlight(note) {
@@ -144,6 +148,11 @@
             }, 500);
         }
 
+        function playSound(note) {
+            const audio = new Audio(pianoNotes[note]);
+            audio.play();
+        }
+
         function checkSequence() {
             const userInput = document.getElementById('input-box').value.toUpperCase();
             userSequence = userInput.split(' ');
@@ -151,11 +160,17 @@
             if (arraysEqual(sequence, userSequence)) {
                 alert("Congratulations! You got it right!");
                 level++;
-                startGame();
+                document.getElementById('message').innerText = 'Try to remember the sequence!';
+                setTimeout(() => {
+                    startGame();
+                }, 1000);
             } else {
                 alert("Oops! Wrong sequence. Game over!");
                 level = 1;
-                startGame();
+                document.getElementById('message').innerText = 'Try again!';
+                setTimeout(() => {
+                    startGame();
+                }, 1000);
             }
         }
 
