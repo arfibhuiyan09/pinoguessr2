@@ -63,15 +63,6 @@
             color: #282c34; /* Dark background color */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
-
-        #input-box {
-            margin-top: 20px;
-            font-size: 16px;
-            padding: 10px;
-            border: 2px solid #61dafb; /* Border color - React Blue */
-            border-radius: 5px;
-            width: 80%;
-        }
     </style>
     <title>Piano Memory Guessing Game</title>
 </head>
@@ -80,7 +71,6 @@
         <h1>Piano Memory Guessing Game</h1>
         <p id="message">Try to remember the sequence!</p>
         <div id="sequence-container"></div>
-        <input type="text" id="input-box" placeholder="Enter the sequence">
         <button onclick="startGame()">Start Game</button>
         <button onclick="checkSequence()">Check My Guess</button>
         <button onclick="showHint()">Hint</button>
@@ -102,7 +92,7 @@
 
         function startGame() {
             sequence = generateSequence(level);
-            playSequence(sequence);
+            showSequence();
         }
 
         function generateSequence(length) {
@@ -120,19 +110,15 @@
             return notes[randomIndex];
         }
 
-        function playSequence(seq) {
+        function showSequence() {
             let i = 0;
             const interval = setInterval(() => {
-                highlight(seq[i]);
-                playSound(seq[i]);
+                highlight(sequence[i]);
                 i++;
-                if (i >= seq.length) {
+                if (i >= sequence.length) {
                     clearInterval(interval);
                 }
             }, 1000);
-            setTimeout(() => {
-                document.getElementById('message').innerText = 'Now, guess the sequence!';
-            }, seq.length * 1000);
         }
 
         function highlight(note) {
@@ -148,29 +134,18 @@
             }, 500);
         }
 
-        function playSound(note) {
-            const audio = new Audio(pianoNotes[note]);
-            audio.play();
-        }
-
         function checkSequence() {
-            const userInput = document.getElementById('input-box').value.toUpperCase();
+            const userInput = prompt("Enter the sequence, separating each note with a space (e.g., A B C).");
             userSequence = userInput.split(' ');
 
             if (arraysEqual(sequence, userSequence)) {
                 alert("Congratulations! You got it right!");
                 level++;
-                document.getElementById('message').innerText = 'Try to remember the sequence!';
-                setTimeout(() => {
-                    startGame();
-                }, 1000);
+                startGame();
             } else {
                 alert("Oops! Wrong sequence. Game over!");
                 level = 1;
-                document.getElementById('message').innerText = 'Try again!';
-                setTimeout(() => {
-                    startGame();
-                }, 1000);
+                startGame();
             }
         }
 
