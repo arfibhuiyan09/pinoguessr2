@@ -73,15 +73,15 @@
             width: 80%;
         }
     </style>
-    <title>Piano Memory Guessing Game</title>
+    <title>Piano Memory Guessing Game - Easy</title>
 </head>
 <body>
     <div id="game-container">
-        <h1>Piano Memory Guessing Game</h1>
+        <h1>Piano Memory Guessing Game - Easy</h1>
         <p id="message">Try to remember the sequence!</p>
         <div id="sequence-container"></div>
+        <button onclick="startGame('easy')">Start Game (Easy)</button>
         <input type="text" id="input-box" placeholder="Enter the sequence">
-        <button onclick="startGame()">Start Game</button>
         <button onclick="checkSequence()">Check My Guess</button>
         <button onclick="showHint()">Hint</button>
     </div>
@@ -100,9 +100,13 @@
         let userSequence = [];
         let level = 1;
 
-        function startGame() {
+        function startGame(difficulty) {
             sequence = generateSequence(level);
-            playSequence(sequence);
+            if (difficulty === 'easy') {
+                showSequence(sequence);
+            } else {
+                playSequence(sequence);
+            }
         }
 
         function generateSequence(length) {
@@ -120,25 +124,22 @@
             return notes[randomIndex];
         }
 
-        function playSequence(seq) {
+        function showSequence(seq) {
             let i = 0;
             const interval = setInterval(() => {
                 highlight(seq[i]);
-                playSound(seq[i]);
                 i++;
                 if (i >= seq.length) {
                     clearInterval(interval);
+                    document.getElementById('message').innerText = 'Now, guess the sequence!';
                 }
             }, 1000);
-            setTimeout(() => {
-                document.getElementById('message').innerText = 'Now, guess the sequence!';
-            }, seq.length * 1000);
         }
 
         function highlight(note) {
             const sequenceContainer = document.getElementById('sequence-container');
             const noteElement = document.createElement('div');
-            noteElement.innerHTML = '?';
+            noteElement.innerHTML = note;
             noteElement.className = 'highlight';
 
             sequenceContainer.appendChild(noteElement);
@@ -148,35 +149,23 @@
             }, 500);
         }
 
-        function playSound(note) {
-            const audio = new Audio(pianoNotes[note]);
-            audio.play();
+        function showHint() {
+            const hintIndex = Math.floor(Math.random() * sequence.length);
+            alert(`Hint: ${sequence[hintIndex]}`);
         }
 
         function checkSequence() {
             const userInput = document.getElementById('input-box').value.toUpperCase();
             userSequence = userInput.split(' ');
-
             if (arraysEqual(sequence, userSequence)) {
                 alert("Congratulations! You got it right!");
                 level++;
-                document.getElementById('message').innerText = 'Try to remember the sequence!';
-                setTimeout(() => {
-                    startGame();
-                }, 1000);
+                startGame('easy');
             } else {
                 alert("Oops! Wrong sequence. Game over!");
                 level = 1;
-                document.getElementById('message').innerText = 'Try again!';
-                setTimeout(() => {
-                    startGame();
-                }, 1000);
+                startGame('easy');
             }
-        }
-
-        function showHint() {
-            const hintIndex = Math.floor(Math.random() * sequence.length);
-            alert(`Hint: ${sequence[hintIndex]}`);
         }
 
         function arraysEqual(arr1, arr2) {
